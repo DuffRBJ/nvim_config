@@ -1,0 +1,11 @@
+
+# Neovim cache and state (DO NOT COMMIT)
+lazy-lock.json
+pack/
+shada/
+swap/
+undo/
+backup/
+
+# OS noise
+.DS_Store
