@@ -17,7 +17,14 @@ vim.g.vimtex_view_general_viewer = "zathura"
 --vim.g.vimtex_view_general_options=  '-reuse-instance -forward-search @tex @line @pdf'
 vim.g.vimtex_view_general_options = "--synctex-forward @line:1:@tex @pdf"
 
-vim.keymap.set("n", "<leader>u", "<Cmd>call UltiSnips#RefreshSnippets()<CR>")
+
+--for Ultisnips to refresh snippets after editing so it is possible to use them immediately
+vim.keymap.set("n", "<leader>u", function()
+  vim.fn["UltiSnips#RefreshSnippets"]()
+  vim.notify("UltiSnips snippets refreshed")
+end, { desc = "UltiSnips: Refresh snippets" })
+
+
 
 local autocmd = vim.api.nvim_create_autocmd
 local map = vim.keymap.set
