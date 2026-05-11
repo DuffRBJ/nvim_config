@@ -9,7 +9,8 @@ vim.cmd("syntax enable")
 vim.g.vimtex_flavor = "latex"
 vim.g.maplocalleader = " "
 
-vim.g.vimtex_view_method = "zathura"
+vim.g.vimtex_view_method = "zathura_simple"
+--vim.g.vimtex_view_zathura_options = "-reuse-instance"
 
 vim.g.vimtex_view_general_viewer = "zathura"
 --do  'cmd.exe /D /c start "" "C:\\Program Files\\SumatraPDF\\SumatraPDF.exe"'
