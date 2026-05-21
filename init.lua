@@ -5,9 +5,12 @@ require('config.keybinds')
 
 vim.cmd("syntax enable")
 
+vim.g.python3_host_prog = vim.fn.expand("~/.venvs/nvim/bin/python")
 
 vim.g.vimtex_flavor = "latex"
 vim.g.maplocalleader = " "
+
+
 
 vim.g.vimtex_view_method = "zathura_simple"
 --vim.g.vimtex_view_zathura_options = "-reuse-instance"
@@ -25,7 +28,10 @@ vim.keymap.set("n", "<leader>u", function()
   vim.notify("UltiSnips snippets refreshed")
 end, { desc = "UltiSnips: Refresh snippets" })
 
-
+vim.keymap.set("n", "<leader>r", function()
+    vim.cmd("w")
+    vim.cmd("belowright split | terminal ~/.venvs/nvim/bin/python %")
+end)
 
 local autocmd = vim.api.nvim_create_autocmd
 local map = vim.keymap.set
@@ -65,7 +71,6 @@ vim.pack.add({
 	{ src = "https://github.com/nvim-treesitter/nvim-treesitter-textobjects", version = "main" },
 	{ src = "https://github.com/ThePrimeagen/harpoon",                        version = "harpoon2" },
 	"https://github.com//nvim-treesitter/nvim-treesitter-context",
-	'https://github.com/neovim/nvim-lspconfig',
 	"https://github.com/williamboman/mason.nvim",
 	--LATEX
 	"https://github.com/lervag/vimtex",
@@ -73,6 +78,7 @@ vim.pack.add({
 	--MAYBE??--
 	"https://github.com/ojroques/vim-oscyank", --For ssh tunnelling and copying to clipboard
 	"https://github.com/tpope/vim-fugitive", -- Git plugin
+	'https://github.com/neovim/nvim-lspconfig',
 	"https://github.com/hrsh7th/nvim-cmp",
 	"https://github.com/hrsh7th/cmp-nvim-lsp",
 	"https://github.com/hrsh7th/cmp-path",
@@ -131,7 +137,7 @@ require('nvim-treesitter').setup({
 
 			configs.setup({
 				-- Languages to install immediately
-				ensure_installed = { "lua", "vim" },
+				ensure_installed = { "lua", "vim", "python" },
 
 				-- Automatically install missing parsers when entering a buffer
 				auto_install = true,
@@ -181,6 +187,35 @@ vim.keymap.set("n", "<C-S-N>", function() harpoon:list():next() end)
 
 require("mason").setup()
 
+vim.lsp.enable({ -- :MasonInstall gopls vtsls svelte-language-server tailwindcss-language-server
+--  "gopls", --   terraform-ls dockerfile-language-server json-lsp yaml-language-server
+  --"vtsls", --   lua-language-server prettierd goimports stylua
+  --"svelte",
+  --"tailwindcss",
+  --"terraformls",
+  --"dockerls",
+  --"jsonls",
+  --"yamlls",
+  "lua_ls",
+  "pyright"
+})
+
+vim.lsp.config("pyright", {
+    cmd = { "pyright-langserver", "--stdio" },
+    filetypes = {"python"},
+    root_markers = { "pyrightconfig.json", "pyproject.toml", "setup.py", "setup.cfg", "requirements.txt", "Pipfile", ".git" },
+    settings = {
+	python = {
+	    pythonPath = "~/.venvs/nvim/bin/python",
+	    analysis = {
+	    autoSearchPaths = true,
+	    diagnosticMode = "openFilesOnly",
+	    useLibraryCodeForTypes = true
+		     },
+	         },	
+	    },
+  })
+
 vim.lsp.config("lua_ls", {
   settings = {
     Lua = {
@@ -194,36 +229,43 @@ vim.lsp.config("lua_ls", {
   },
 })
 
-vim.lsp.enable({ -- :MasonInstall gopls vtsls svelte-language-server tailwindcss-language-server
-  "gopls", --   terraform-ls dockerfile-language-server json-lsp yaml-language-server
-  "vtsls", --   lua-language-server prettierd goimports stylua
-  "svelte",
-  "tailwindcss",
-  "terraformls",
-  "dockerls",
-  "jsonls",
-  "yamlls",
-  "lua_ls",
+
+local cmp = require("cmp")
+
+
+cmp.setup({
+  mapping = cmp.mapping.preset.insert({
+    ["<C-Space>"] = cmp.mapping.complete(),   -- trigger completion
+    ["<CR>"] = cmp.mapping.confirm({ select = true }), -- accept suggestion
+  }),
+  sources = {
+    { name = "nvim_lsp" },
+  },
 })
 
-autocmd("LspAttach", {
-  group = augroup,
-  callback = function(ev)
-    local bufopts = { buffer = ev.buf, silent = true }
-    map("n", "gd", vim.lsp.buf.definition, bufopts)
-    map("n", "gD", vim.lsp.buf.declaration, bufopts)
-    map("n", "gI", vim.lsp.buf.implementation, bufopts)
-    map("n", "gy", vim.lsp.buf.type_definition, bufopts)
-    map("i", "<C-k>", vim.lsp.buf.signature_help, bufopts)
-    map("n", "<leader>ca", vim.lsp.buf.code_action, { buffer = ev.buf, desc = "Code action" })
-    map("n", "<leader>cr", vim.lsp.buf.rename, { buffer = ev.buf, desc = "Rename" })
 
-    local client = assert(vim.lsp.get_client_by_id(ev.data.client_id))
-    if client:supports_method("textDocument/completion") then
-      vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
-    end
-  end,
-})
+
+
+--autocmd("LspAttach", {
+--  group = augroup,
+--  callback = function(ev)
+--    local bufopts = { buffer = ev.buf, silent = true }
+--    map("n", "gd", vim.lsp.buf.definition, bufopts)
+--    map("n", "gD", vim.lsp.buf.declaration, bufopts)
+--    map("n", "gI", vim.lsp.buf.implementation, bufopts)
+--    map("n", "gy", vim.lsp.buf.type_definition, bufopts)
+--    map("i", "<C-k>", vim.lsp.buf.signature_help, bufopts)
+--    map("n", "<leader>ca", vim.lsp.buf.code_action, { buffer = ev.buf, desc = "Code action" })
+--    map("n", "<leader>cr", vim.lsp.buf.rename, { buffer = ev.buf, desc = "Rename" })
+--
+--    local client = assert(vim.lsp.get_client_by_id(ev.data.client_id))
+--    if client:supports_method("textDocument/completion") then
+--      vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
+--    end
+--  end,
+--})
+
+
 
 --autocmd("InsertEnter", {
  -- group = augroup,
