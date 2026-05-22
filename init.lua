@@ -28,13 +28,13 @@ vim.keymap.set("n", "<leader>u", function()
   vim.notify("UltiSnips snippets refreshed")
 end, { desc = "UltiSnips: Refresh snippets" })
 
-vim.keymap.set("n", "<leader>r", function()
-    vim.cmd("w")
-    vim.cmd("belowright split | terminal ~/.venvs/nvim/bin/python %")
-end)
+
 
 local autocmd = vim.api.nvim_create_autocmd
 local map = vim.keymap.set
+
+
+
 
 
 
@@ -62,28 +62,59 @@ vim.g.UltiSnipsSnippetDirectories = {
 vim.pack.add({
 	--  "https://github.com/EdenEast/nightfox.nvim",
 	"https://github.com/nvim-tree/nvim-web-devicons", -- dependency for lualine
-	"https://github.com/folke/tokyonight.nvim",
+	"https://github.com/folke/tokyonight.nvim", --for tokyonight highlighting
 	"https://github.com/nvim-lualine/lualine.nvim",  --dependencies: nvim-web-devicons
+	"https://github.com/akinsho/toggleterm.nvim", --for controling terminal splits and such
+	--Telescope--
 	"https://github.com/nvim-lua/plenary.nvim",      --dependency for telescope
 	"https://github.com/nvim-telescope/telescope.nvim", --dependencies: plenary
 	--    "https://github.com/nvim-telescope/telescope-fzf-native.nvim"
+	-- Treesitter --
 	{ src = "https://github.com/nvim-treesitter/nvim-treesitter",             version = "master" },
 	{ src = "https://github.com/nvim-treesitter/nvim-treesitter-textobjects", version = "main" },
 	{ src = "https://github.com/ThePrimeagen/harpoon",                        version = "harpoon2" },
 	"https://github.com//nvim-treesitter/nvim-treesitter-context",
-	"https://github.com/williamboman/mason.nvim",
 	--LATEX
 	"https://github.com/lervag/vimtex",
 	"https://github.com/sirver/ultisnips",
 	--MAYBE??--
 	"https://github.com/ojroques/vim-oscyank", --For ssh tunnelling and copying to clipboard
 	"https://github.com/tpope/vim-fugitive", -- Git plugin
+	--LSP and autocompletion--
+	"https://github.com/williamboman/mason.nvim",
 	'https://github.com/neovim/nvim-lspconfig',
 	"https://github.com/hrsh7th/nvim-cmp",
 	"https://github.com/hrsh7th/cmp-nvim-lsp",
 	"https://github.com/hrsh7th/cmp-path",
 	"https://github.com/hrsh7th/cmp-buffer",
 })
+
+
+
+--To create a resuable terminal when using python	
+
+
+local Terminal = require("toggleterm.terminal").Terminal
+
+local pyterm = Terminal:new({
+  direction = "horizontal",
+  close_on_exit = false,
+})
+
+function RunPython(file)
+  pyterm:toggle()         -- open if closed, reuse if open
+  pyterm:send("clear", true)
+  pyterm:send("python3 " .. file, true) -- send command
+end
+
+vim.keymap.set("n", "<leader>rp", function()
+    vim.cmd("w")
+    RunPython(vim.fn.expand("%:p"))
+   -- vim.cmd("belowright split | terminal ~/.venvs/nvim/bin/python %")
+end)
+---------------
+----
+
 
 --color scheme--
 --vim.cmd.colorscheme("nordfox")
