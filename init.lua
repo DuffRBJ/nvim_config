@@ -35,7 +35,7 @@ local map = vim.keymap.set
 
 
 
-
+vim.keymap.set('t', '<Esc>', [[<C-\><C-n>]], { desc = 'Exit terminal mode' })
 
 
 
@@ -102,11 +102,16 @@ local pyterm = Terminal:new({
 })
 
 function RunPython(file)
-  pyterm:toggle()         -- open if closed, reuse if open
+  --pyterm:toggle()         -- open if closed, reuse if open
   pyterm:send("clear", true)
-  pyterm:send("python3 " .. file, true) -- send command
+  pyterm:send(vim.g.python3_host_prog .." " .. file, true) -- send command
+
 end
 
+vim.keymap.set("n", "<leader>tp", function()
+   pyterm:toggle()
+   -- vim.cmd("belowright split | terminal ~/.venvs/nvim/bin/python %")
+end)
 vim.keymap.set("n", "<leader>rp", function()
     vim.cmd("w")
     RunPython(vim.fn.expand("%:p"))
