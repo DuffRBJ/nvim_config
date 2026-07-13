@@ -8,6 +8,7 @@ vim.cmd("syntax enable")
 vim.g.python3_host_prog = vim.fn.expand("~/.venvs/nvim/bin/python")
 
 vim.g.vimtex_flavor = "latex"
+vim.g.tex_flavor = "latex"
 vim.g.maplocalleader = " "
 
 
@@ -108,8 +109,10 @@ function RunPython(file)
 
 end
 
+--open python terminal
 vim.keymap.set("n", "<leader>tp", function()
    pyterm:toggle()
+   vim.cmd("wincmd p")
    -- vim.cmd("belowright split | terminal ~/.venvs/nvim/bin/python %")
 end)
 vim.keymap.set("n", "<leader>rp", function()
