@@ -112,7 +112,7 @@ end
 --open python terminal
 vim.keymap.set("n", "<leader>tp", function()
    pyterm:toggle()
-   vim.cmd("wincmd p")
+   vim.cmd("stopinsert | wincmd p")
    -- vim.cmd("belowright split | terminal ~/.venvs/nvim/bin/python %")
 end)
 vim.keymap.set("n", "<leader>rp", function()
