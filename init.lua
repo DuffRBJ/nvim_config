@@ -69,7 +69,7 @@ vim.pack.add({
 	--Telescope--
 	"https://github.com/nvim-lua/plenary.nvim",      --dependency for telescope
 	"https://github.com/nvim-telescope/telescope.nvim", --dependencies: plenary
-	--    "https://github.com/nvim-telescope/telescope-fzf-native.nvim"
+	"https://github.com/nvim-telescope/telescope-fzf-native.nvim",
 	-- Treesitter --
 	{ src = "https://github.com/nvim-treesitter/nvim-treesitter",             version = "master" },
 	{ src = "https://github.com/nvim-treesitter/nvim-treesitter-textobjects", version = "main" },
@@ -131,7 +131,6 @@ vim.cmd.colorscheme("tokyonight")
 --PLUGIN SETUP
 require("lualine").setup({ opts = { theme = 'tokyonight' } })
 
-require('telescope').setup({})
 require('telescope').setup {
 	defaults = {
 		-- Default configuration for telescope goes here:
@@ -147,7 +146,7 @@ require('telescope').setup {
 	},
 	pickers = {
 		find_files = {
-			hidden = true, --display hidden files such as config
+			hidden = false, --display hidden files such as config
 		}
 		-- Default configuration for builtin pickers goes here:
 		-- picker_name = {
@@ -158,6 +157,12 @@ require('telescope').setup {
 		-- builtin picker
 	},
 	extensions = {
+	    fzf = {
+		fuzzy = true, -- Enable fuzzy matching
+		override_generic_sorter = true, -- Override the default sorter
+		override_file_sorter = true, -- Override the file sorter
+		case_mode = "smart_case", -- Options: "ignore_case", "respect_case", "smart_case"
+		    }
 		-- Your extension configuration goes here:
 		-- extension_name = {
 		--   extension_config_key = value,
